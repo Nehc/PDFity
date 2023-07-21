@@ -10,10 +10,10 @@ ARG NB_GID="100"
 ARG NB_DIR="work"
 
 RUN apt-get update --yes && apt-get upgrade --yes && \
-    apt install --yes software-properties-common 
+    apt-get install --yes software-properties-common 
 
 RUN add-apt-repository ppa:alex-p/jbig2enc && apt-get update --yes && \
-    apt install --yes --no-install-recommends && \
+    apt-get install --yes --no-install-recommends && \
     locales poppler-utils swig3.0 build-essential \
     python-is-python3 python3-dev python3-pip \
     ocrmypdf wkhtmltopdf jbig2enc optipng && \
