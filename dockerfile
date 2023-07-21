@@ -18,7 +18,7 @@ RUN add-apt-repository ppa:alex-p/jbig2enc && apt-get update --yes && \
     apt install --yes --no-install-recommends && \
     locales poppler-utils swig3.0 build-essential \
     python-is-python3 python3-dev python3-pip \
-    ocrmypdf wkhtmltopdf jbig2enc optipng &&
+    ocrmypdf wkhtmltopdf jbig2enc optipng && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
