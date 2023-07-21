@@ -30,7 +30,7 @@ ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 ADD https://github.com/tesseract-ocr/tessdata/raw/main/rus.traineddata /
-    ./rus.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
+    /usr/share/tesseract-ocr/4.00/tessdata/
 
 # Create NB_USER with name NB_USER user with UID=1000 and in the 'users' group
 #chmod g+w /etc/passwd && \
