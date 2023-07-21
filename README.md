@@ -7,6 +7,8 @@ git clone https://github.com/Nehc/PDFity.git
 cd PDFity
 docker-compose up
 ```
+open http://localhost:7860/ in browser
+
 ![image](https://github.com/Nehc/PDFity/assets/8426195/a14fb3fc-12ba-463f-aad1-b984fc203b5e)
 
 
