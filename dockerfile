@@ -9,8 +9,6 @@ ARG NB_UID="1000"
 ARG NB_GID="100"
 ARG NB_DIR="work"
 
-COPY packages.txt ./
-
 RUN apt-get update --yes && apt-get upgrade --yes && \
     apt install --yes software-properties-common 
 
