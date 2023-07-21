@@ -32,7 +32,8 @@ def pdf_translation(input_file,
                     chat_id=None, 
                     t_lang='eng+rus', 
                     clear_save_origin=True, 
-                    #progress=gr.Progress(track_tqdm=True) #rise error https://github.com/gradio-app/gradio/issues/4980
+                    #progress=gr.Progress(track_tqdm=True) 
+                    #rise error https://github.com/gradio-app/gradio/issues/4980
                 ):
     input_path = input_file.name
     doc = fitz.open(input_path)
@@ -167,7 +168,8 @@ with gr.Blocks() as demo:
                      token=None,
                      chat_id=None,
                      mode = 'auto',
-                     #progress=gr.Progress(track_tqdm=True) #rise error https://github.com/gradio-app/gradio/issues/4980
+                     #progress=gr.Progress(track_tqdm=True) 
+                     #rise error https://github.com/gradio-app/gradio/issues/4980
                 ):
         ru_text = []; en_text = []
         doc = fitz.open(input_file.name)
@@ -209,7 +211,8 @@ with gr.Blocks() as demo:
                     two_text:gr.update(label="text",value='',visible=False)}
 
     def mirror(input_file,
-               #progress=gr.Progress(track_tqdm=True) #rise error https://github.com/gradio-app/gradio/issues/4980
+               #progress=gr.Progress(track_tqdm=True) 
+               #rise error https://github.com/gradio-app/gradio/issues/4980
             ):
         res = input_file.name
         for i in trange(100):
