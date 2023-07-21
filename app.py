@@ -22,8 +22,8 @@ def is_content(text):
     pos_tags = nltk.pos_tag(words)
     # Проверяем, что есть хотя бы одно существительное (NN), или глагол (VB)
     for word, pos in pos_tags:
-        if pos.startswith("NN") 
-          or pos.startswith("VB"):
+        if (pos.startswith("NN") or 
+            pos.startswith("VB")):
             return True
     return False
 
