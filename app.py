@@ -145,9 +145,12 @@ def ocrpdf(input_file,
 
 with gr.Blocks() as demo:
     gr.Markdown('## PDF "swiss army knife" (multitool). Translate, OCR, text extraction, etc.')
-     #with gr.Row():
-    with gr.Tab('PDF'): file = gr.File(file_types=['.pdf'], label="File")
-    with gr.Tab('Image'): imge = gr.Image(label="File",type='filepath')
+    #with gr.Row():
+    with gr.Tabs() as tabs:
+        with gr.TabItem('PDF', id=0): 
+            file = gr.File(label="File",file_types=['.pdf'])
+        with gr.TabItem('Image',id=1): 
+            imge = gr.Image(label="File",type='filepath')
     prev = gr.Gallery(label="Preview", allow_preview=False)
     with gr.Row():
         one_text = gr.Textbox(label="Text one", visible=False)
@@ -232,7 +235,8 @@ with gr.Blocks() as demo:
         ext = f_name.split('.')[-1]
         n_name = f_name.replace(ext,'pdf')
         os.system(f'tesseract {f_name} {n_name}')
-        return {file:gr.update(value=n_name), 
+        return {tabs:gr.update(selected=0),
+                file:gr.update(value=n_name), 
                 prev:gr.update(value=[f_name],visible=True),
                 one_text:gr.update(label="text",value='',visible=False),
                 two_text:gr.update(label="text",value='',visible=False)}
@@ -247,7 +251,7 @@ with gr.Blocks() as demo:
                 two_text:gr.update(label="Checked text",value=text2,visible=True)} 
     
     file.change(fileOnChange,inputs=[file],outputs=[prev, one_text, two_text])
-    imge.change(imgeOnChange,inputs=[imge],outputs=[file, prev, one_text, two_text])
+    imge.change(imgeOnChange,inputs=[imge],outputs=[tabs, file, prev, one_text, two_text])
     ocr_btn.click(ocrpdf, inputs=[file, token, chat_id, lang], outputs=[file], api_name='ocr')
     tr_btn.click(pdf_translation, inputs=[file, token, chat_id, lang], outputs=[file], api_name='trl')
     tex_btn.click(extract_text, inputs=[file, token, chat_id, lang], outputs=[one_text, two_text], api_name='tex')
