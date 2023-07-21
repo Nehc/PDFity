@@ -1,0 +1,11 @@
+PyPDF2
+PyMuPDF
+ocrmypdf
+wkhtmltopdf
+pdf2image
+langdetect
+jamspell
+shortuuid
+googletrans==4.0.0-rc1
+gradio
+nltk
