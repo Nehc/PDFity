@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  pdfity:
+    image: nehcy/pdfity
+    container_name: PGFity 
+    build: . 
+    environment:
+      - GRADIO_SERVER_NAME=0.0.0.0
+# if you want to control tmp directory - uncomment
+#    volumes:
+#      - ./tmp:/tmp/gradio
+    command: python app.py
+    init: true
+    restart: always
+    stdin_open: true    
+    network_mode: bridge
+    tty: true
+    ports:
+      - 7860:7860
