@@ -52,8 +52,9 @@ RUN python -m pip install --upgrade pip wheel && \
 
 WORKDIR "./${NB_DIR}"
 
-COPY ./src/ ./
-ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz
+COPY app.py ./
+ADD https://github.com/Nehc/OCRmyPDF_tgtqdm/blob/main/plugin.py ./
+ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz ./
 
 # Configure container startup: if not use compose
 # if use doker standalone uncomemnt next 
