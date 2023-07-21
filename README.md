@@ -7,7 +7,8 @@ git clone https://github.com/Nehc/PDFity.git
 cd PDFity
 docker-compose up
 ```
-![image](https://github.com/Nehc/PDFity/assets/8426195/a62f8a88-0845-4018-91c5-182be7cae013)
+![image](https://github.com/Nehc/PDFity/assets/8426195/a14fb3fc-12ba-463f-aad1-b984fc203b5e)
+
 
 ### How to use 
 1. You have a document in PDF scan. You can get its OCR-text. Upload the file and click **OCR**. You can set the language if needed.
