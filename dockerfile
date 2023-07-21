@@ -58,4 +58,4 @@ ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz ./
 
 # Configure container startup: if not use compose
 # if use doker standalone uncomemnt next 
-#ENTRYPOINT ["gradio", "app.py"]
+#ENTRYPOINT ["python", "app.py"]
