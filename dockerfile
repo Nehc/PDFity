@@ -14,9 +14,9 @@ RUN apt-get update --yes && apt-get upgrade --yes && \
 
 RUN add-apt-repository ppa:alex-p/jbig2enc && apt-get update --yes && \
     apt-get install --yes --no-install-recommends \
-    locales poppler-utils swig3.0 build-essential \
-    python-is-python3 python3-dev python3-pip \
-    ocrmypdf wkhtmltopdf jbig2enc optipng && \
+    build-essential locales poppler-utils swig3.0 \
+    ocrmypdf wkhtmltopdf jbig2enc optipng  \
+    python3-dev python-is-python3 pip && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
@@ -48,11 +48,12 @@ RUN python -m pip install --upgrade pip wheel && \
     pip install --user -r requirements.txt && \
     python -m pip cache purge
 
+ADD https://github.com/Nehc/OCRmyPDF_tgtqdm/blob/main/plugin.py ./
+ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz ./
+
 WORKDIR "./${NB_DIR}"
 
 COPY app.py ./
-ADD https://github.com/Nehc/OCRmyPDF_tgtqdm/blob/main/plugin.py ./
-ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz ./
 
 # Configure container startup: if not use compose
 # if use doker standalone uncomemnt next 

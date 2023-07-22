@@ -15,7 +15,7 @@ nltk.download('averaged_perceptron_tagger')
 
 translator = Translator()
 corrector = TSpellCorrector()
-corrector.LoadLangModel('ru_small.bin')
+corrector.LoadLangModel('../ru_small.bin')
 
 def is_content(text):
     words = nltk.word_tokenize(text)
@@ -137,7 +137,7 @@ def ocrpdf(input_file,
     if token:
         ocrmypdf.ocr(input, output, 
                      language='eng+rus' if language == 'auto' else language,
-                     plugins='tele_tqdm.py', chat_id=chat_id, token=token)
+                     plugins='../tele_tqdm.py', chat_id=chat_id, token=token)
     else:
         ocrmypdf.ocr(input_file.name, output, 
                      language='eng+rus' if language == 'auto' else language)
@@ -257,5 +257,7 @@ with gr.Blocks() as demo:
     tex_btn.click(extract_text, inputs=[file, token, chat_id, lang], outputs=[one_text, two_text], api_name='tex')
     spl_btn.click(spellCheck, inputs=[one_text, two_text], outputs=[one_text, two_text])
 
-if __name__ == "__main__":
-    demo.launch() #demo.queue().launch()
+#if __name__ == "__main__":
+#    demo.queue().launch()
+
+demo.launch() 
