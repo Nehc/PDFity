@@ -13,7 +13,7 @@ open ```http://localhost:7860/``` in browser
 
 
 ### How to use 
-1. You have a document in PDF scan. You can get its OCR-text. Upload the file and click **OCR**. You can set the language if needed.
+1. You have a document in PDF scan. You can get its OCR-text (in text layer). Upload the file and click **OCR**. You can set the language if needed.
 2. You receive PDF with OCR (or you have a regular pdf with text conent). You want to translate it into russian. You can do this in two ways:
    - Just klick **Translate (RU)**. But... It's not good idea because... Automatic translate is not very good: formulas, same else...
    - You сan got original and translated document in one: page by page. Select *eng+rus* option in language and make a translate!
