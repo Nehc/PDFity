@@ -32,21 +32,22 @@ ENV LC_ALL en_US.UTF-8
 
 RUN useradd -l -m -s /bin/bash -N -u "${NB_UID}" "${NB_USER}" # && \
     chown "${NB_USER}:${NB_GID}" "/home/${NB_USER}/"
- 
-USER "${NB_UID}"
 
-WORKDIR "/home/${NB_USER}/"
+WORKDIR "/home/${NB_USER}/" 
+ 
+ADD https://raw.githubusercontent.com/Nehc/OCRmyPDF_tgtqdm/main/plugin.py ./
+ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz ./
+RUN tar -xzvf ru.tar.gz && rm ru.tar.gz && chmod +r plugin.py ru_small.bin
 
 ENV PATH="$PATH:/home/${NB_USER}/.local/bin"
 
+USER "${NB_UID}"
+
 COPY requirements.txt ./
 
-RUN python -m pip install --upgrade pip wheel && \
+RUN python -m pip install --user --upgrade pip wheel && \
     pip install --user -r requirements.txt && \
     python -m pip cache purge
-
-ADD https://github.com/Nehc/OCRmyPDF_tgtqdm/blob/main/plugin.py ./
-ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz ./
 
 WORKDIR "./${NB_DIR}"
 
