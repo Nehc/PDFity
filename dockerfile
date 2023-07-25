@@ -15,9 +15,13 @@ RUN apt-get update --yes && apt-get upgrade --yes && \
 RUN add-apt-repository ppa:alex-p/jbig2enc && apt-get update --yes && \
     apt-get install --yes --no-install-recommends \
     build-essential locales poppler-utils swig3.0 \
-    ocrmypdf wkhtmltopdf jbig2enc optipng  \
+    ocrmypdf wkhtmltopdf jbig2enc optipng tesseract-ocr-rus \
     python3-dev python-is-python3 pip && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+#   tesseract-ocr tesseract-ocr-rus  \
+#ADD https://github.com/tesseract-ocr/tessdata/raw/main/rus.traineddata \
+#    /usr/share/tesseract-ocr/4.00/tessdata/
 
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
@@ -26,9 +30,6 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
-
-ADD https://github.com/tesseract-ocr/tessdata/raw/main/rus.traineddata \
-    /usr/share/tesseract-ocr/4.00/tessdata/
 
 # Create NB_USER with name NB_USER user with UID=1000 and in the 'users' group
 #chmod g+w /etc/passwd && \
@@ -50,6 +51,7 @@ RUN python -m pip install --upgrade pip wheel && \
 
 ADD https://github.com/Nehc/OCRmyPDF_tgtqdm/blob/main/plugin.py ./
 ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz ./
+#ADD https://github.com/tesseract-ocr/tessdata/raw/main/rus.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
 
 WORKDIR "./${NB_DIR}"
 
