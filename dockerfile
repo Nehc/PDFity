@@ -19,10 +19,6 @@ RUN add-apt-repository ppa:alex-p/jbig2enc && apt-get update --yes && \
     python3-dev python-is-python3 pip && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-#   tesseract-ocr tesseract-ocr-rus  \
-#ADD https://github.com/tesseract-ocr/tessdata/raw/main/rus.traineddata \
-#    /usr/share/tesseract-ocr/4.00/tessdata/
-
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
@@ -51,7 +47,6 @@ RUN python -m pip install --upgrade pip wheel && \
 
 ADD https://github.com/Nehc/OCRmyPDF_tgtqdm/blob/main/plugin.py ./
 ADD https://github.com/bakwc/JamSpell-models/raw/master/ru.tar.gz ./
-#ADD https://github.com/tesseract-ocr/tessdata/raw/main/rus.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
 
 WORKDIR "./${NB_DIR}"
 
