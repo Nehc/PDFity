@@ -1,7 +1,7 @@
 import os, shutil
 from time import sleep
 import gradio as gr
-import fitz, nltk, ocrmypdf
+import fitz, nltk, ocrmypdf, img2pdf
 from googletrans import Translator
 from pdf2image import convert_from_path
 from tqdm.contrib.telegram import trange as tg_range
@@ -17,6 +17,7 @@ translator = Translator()
 corrector = TSpellCorrector()
 corrector.LoadLangModel('../ru_small.bin')
 
+
 def is_content(text):
     words = nltk.word_tokenize(text)
     pos_tags = nltk.pos_tag(words)
@@ -26,6 +27,7 @@ def is_content(text):
             pos.startswith("VB")):
             return True
     return False
+
 
 def pdf_translation(input_file,
                     token=None,
@@ -43,7 +45,7 @@ def pdf_translation(input_file,
         if res_doc.page_count - (doc.page_count 
                                  if t_lang == 'eng+rus' 
                                  else 0) == doc.page_count:
-            return output_path
+            return output_path,'previos version detect!'
         else: 
             s_page = (res_doc.page_count - doc.page_count) * \
                         (2 if t_lang == 'eng+rus' else 1)    
@@ -59,7 +61,8 @@ def pdf_translation(input_file,
         s_page = 0
     for k in (tg_range(s_page, doc.page_count, 
                        token=token, chat_id=chat_id,
-                       descr="Translate pages") if token 
+                       desc="Translate pages"
+                       ) if token 
                            else trange(s_page, doc.page_count)):
         #origin_text.append(doc.get_page_text(k))
         page = doc[k]
@@ -102,10 +105,17 @@ def pdf_translation(input_file,
                     fs -= 0.5
                     tw = fitz.TextWriter(page.rect)
                     pos = block[0],ps[i-c] if dr == 0 else block[1]
-                    lp = tw.fill_textbox(
-                        block[:4], new_text, fontsize=fs, pos=pos,
-                        align=fitz.TEXT_ALIGN_JUSTIFY
-                    )
+                    try:
+                        lp = tw.fill_textbox(
+                            block[:4], new_text, fontsize=fs, pos=pos,
+                            align=fitz.TEXT_ALIGN_JUSTIFY
+                        )
+                    except:
+                        lp = tw.fill_textbox(
+                            block[:4], new_text, fontsize=fs, pos=block[:2],
+                            align=fitz.TEXT_ALIGN_JUSTIFY
+                        )
+
                     if fs <= 0: break
                 page.add_redact_annot(block[:4],fill=(1,1,1) if 
                                                  input_path.endswith('ocr.pdf') 
@@ -123,7 +133,8 @@ def pdf_translation(input_file,
         doc.save(output_path, garbage=4, clean=True, 
                  deflate=True, deflate_images=True, deflate_fonts=True)
     doc.close(); res_doc.close()
-    return output_path 
+    return output_path, 'OK', convert_from_path(output_path) 
+
 
 def ocrpdf(input_file,
            token=None,
@@ -135,16 +146,24 @@ def ocrpdf(input_file,
     input = input_file.name
     output = input_file.name.replace('.pdf','_ocr.pdf')
     if token:
-        ocrmypdf.ocr(input, output, 
-                     language='eng+rus' if language == 'auto' else language,
-                     plugins='../tele_tqdm.py', chat_id=chat_id, token=token)
+        try:
+            ocrmypdf.ocr(input, output, 
+                         language='eng+rus' if language == 'auto' else language,
+                         plugins='../plugin.py', chat_id=chat_id, token=token)
+        except ocrmypdf.exceptions.PriorOcrFoundError:
+            return input, 'page already has text!' 
     else:
-        ocrmypdf.ocr(input_file.name, output, 
-                     language='eng+rus' if language == 'auto' else language)
-    return output
+        try:
+            ocrmypdf.ocr(input_file.name, output, 
+                         language='eng+rus' if language == 'auto' else language)
+        except ocrmypdf.exceptions.PriorOcrFoundError:
+            return input, 'page already has text!' 
+            
+    return output, 'OK'
+
 
 with gr.Blocks() as demo:
-    gr.Markdown('## PDF "swiss army knife" (multitool). Translate, OCR, text extraction, etc.')
+    gr.Markdown('## PDF "swiss army knife" (multitool). Translate, OCR, text extraction, etc...')
     #with gr.Row():
     with gr.Tabs() as tabs:
         with gr.TabItem('PDF', id=0): 
@@ -161,12 +180,14 @@ with gr.Blocks() as demo:
     with gr.Row():    
         lang = gr.Dropdown(["auto","eng+rus","rus+eng", "eng", "rus"], label='Language', value='auto')
         spell = gr.Checkbox(label="Use spell corrector", visible=False) #temporaly not use
+    res = gr.Textbox(show_label=False,interactive=False) #Markdown('')
     with gr.Row():
         ocr_btn = gr.Button("OCR")
         tr_btn = gr.Button("Translate (RU)")
         tex_btn = gr.Button("Extract text")
         spl_btn = gr.Button("Spell (RU)")
-    
+
+
     def extract_text(input_file,
                      token=None,
                      chat_id=None,
@@ -222,24 +243,34 @@ with gr.Blocks() as demo:
             sleep(.1)
         return res 
 
+
     def fileOnChange(input_file):
         images=[]
         if input_file:
-            images = convert_from_path(input_file.name)
-        return {prev:gr.update(value=images,visible=True),
+            images=convert_from_path(input_file.name) 
+        return {prev:images,
                 one_text:gr.update(label="text",value='',visible=False),
                 two_text:gr.update(label="text",value='',visible=False)}
+       
 
     def imgeOnChange(input_image):
+        if input_image == None:
+            return {file:None, res:'Clear', prev:[],
+                    one_text:gr.update(label="text",value='',visible=False),
+                    two_text:gr.update(label="text",value='',visible=False),
+                    tabs:gr.update(selected=1)}
         f_name = input_image
         ext = f_name.split('.')[-1]
-        n_name = f_name.replace(ext,'pdf')
-        os.system(f'tesseract {f_name} {n_name}')
-        return {tabs:gr.update(selected=0),
-                file:gr.update(value=n_name), 
-                prev:gr.update(value=[f_name],visible=True),
+        n_name = f_name.replace(f'.{ext}','.pdf')         
+        pdf_bytes = img2pdf.convert(f_name)
+        with open(n_name, "wb") as f:
+            f.write(pdf_bytes)
+
+        return {file:f'{n_name}', res:'OK' , prev:[f_name],
                 one_text:gr.update(label="text",value='',visible=False),
-                two_text:gr.update(label="text",value='',visible=False)}
+                two_text:gr.update(label="text",value='',visible=False),
+                tabs:gr.update(selected=0)}
+
 
     def spellCheck(text1,text2):
         if len(text1)>0 and detect(text1)=='ru':
@@ -249,15 +280,15 @@ with gr.Blocks() as demo:
             text2 = corrector.FixFragment(text2) 
         return {one_text:gr.update(label="Origrin text",value=text1,visible=True),
                 two_text:gr.update(label="Checked text",value=text2,visible=True)} 
-    
+
     file.change(fileOnChange,inputs=[file],outputs=[prev, one_text, two_text])
-    imge.change(imgeOnChange,inputs=[imge],outputs=[tabs, file, prev, one_text, two_text])
-    ocr_btn.click(ocrpdf, inputs=[file, token, chat_id, lang], outputs=[file], api_name='ocr')
-    tr_btn.click(pdf_translation, inputs=[file, token, chat_id, lang], outputs=[file], api_name='trl')
+    imge.change(imgeOnChange,inputs=[imge],outputs=[file, res, prev, one_text, two_text, tabs], api_name='img2pdf')
+    tr_btn.click(pdf_translation, inputs=[file, token, chat_id, lang], outputs=[file, res, prev], api_name='trl')
+    ocr_btn.click(ocrpdf, inputs=[file, token, chat_id, lang], outputs=[file, res], api_name='ocr')
     tex_btn.click(extract_text, inputs=[file, token, chat_id, lang], outputs=[one_text, two_text], api_name='tex')
     spl_btn.click(spellCheck, inputs=[one_text, two_text], outputs=[one_text, two_text])
 
 #if __name__ == "__main__":
-#    demo.queue().launch()
+#demo.queue().launch()
 
 demo.launch() 
